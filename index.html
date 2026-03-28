@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>RSV 예방 선물</title>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" />
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css"
+  />
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    body {
+      font-family: 'Pretendard', sans-serif;
+      background-color: #8d88ec;
+    }
+
+    .screen {
+      position: relative;
+      width: 100%;
+      height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 58px;
+      padding: 200px 24px;
+      overflow: hidden;
+    }
+
+    /* 배경 레이어들 */
+    .bg-base {
+      position: absolute;
+      inset: 0;
+      background-color: #8d88ec;
+    }
+
+    .bg-gradient {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to bottom, rgba(255, 91, 130, 0) 47.416%, #ff5b82 100%);
+      mix-blend-mode: color-burn;
+    }
+
+    .bg-texture {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      mix-blend-mode: multiply;
+      pointer-events: none;
+    }
+
+    .bg-color-overlay {
+      position: absolute;
+      inset: 0;
+      background-color: #605bbf;
+      mix-blend-mode: color;
+    }
+
+    .baby-image-wrap {
+      position: absolute;
+      bottom: 0;
+      left: -20px;
+      right: -20px;
+      aspect-ratio: 1217 / 860;
+    }
+
+    .baby-image-wrap img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      pointer-events: none;
+    }
+
+    /* 메인 콘텐츠 */
+    .main-text-box {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+    }
+
+    .text-line {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+    }
+
+    .text-line + .text-line {
+      gap: 2px;
+    }
+
+    .plain-text {
+      font-size: 20px;
+      font-weight: 600;
+      color: #ffffff;
+      letter-spacing: -0.8px;
+      line-height: normal;
+      white-space: nowrap;
+    }
+
+    .highlight {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background-color: #ffffff;
+      padding: 4px;
+    }
+
+    .highlight span {
+      font-size: 18px;
+      font-weight: 700;
+      color: #413ca0;
+      letter-spacing: -0.72px;
+      line-height: normal;
+      white-space: nowrap;
+    }
+
+    /* 입력창 */
+    .input-row {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      gap: 4px;
+      align-items: flex-start;
+    }
+
+    .input-field {
+      width: 251px;
+      background-color: #ffffff;
+      border: none;
+      border-radius: 8px;
+      padding: 16px 32px;
+      font-family: 'Pretendard', sans-serif;
+      font-size: 18px;
+      font-weight: 500;
+      color: #1a1a1a;
+      letter-spacing: -0.72px;
+      text-align: center;
+      outline: none;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+
+    .input-field::placeholder {
+      color: #7d7d7d;
+    }
+
+    .input-field:focus {
+      box-shadow: 0 0 0 2px rgba(65, 60, 160, 0.4);
+    }
+
+    .enter-btn {
+      width: 53px;
+      height: 53px;
+      background-color: #413ca0;
+      border: none;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+      -webkit-tap-highlight-color: transparent;
+      transition: background-color 0.15s ease;
+    }
+
+    .enter-btn:active {
+      background-color: #332e8a;
+    }
+
+    .enter-btn svg {
+      width: 28px;
+      height: 28px;
+    }
+
+    /* 토스트 메시지 */
+    .toast {
+      position: fixed;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background-color: rgba(30, 27, 110, 0.92);
+      color: #fff;
+      font-size: 15px;
+      font-weight: 500;
+      letter-spacing: -0.4px;
+      padding: 12px 24px;
+      border-radius: 100px;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease, transform 0.25s ease;
+      z-index: 999;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* 입력창 저장 중 상태 */
+    .input-field:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  </style>
+</head>
+<body>
+  <div class="screen">
+    <!-- 배경 -->
+    <div class="bg-base"></div>
+    <div class="bg-gradient"></div>
+    <img class="bg-texture" src="https://hmgyoqymifgcamjfacbo.supabase.co/storage/v1/object/public/RSV/img/background%20texture.png" alt="" />
+    <div class="bg-color-overlay"></div>
+
+    <!-- 아기 이미지 -->
+    <div class="baby-image-wrap">
+      <img src="https://hmgyoqymifgcamjfacbo.supabase.co/storage/v1/object/public/RSV/img/baby.png" alt="아기 이미지" />
+    </div>
+
+    <!-- 메인 텍스트 -->
+    <div class="main-text-box">
+      <div class="text-line">
+        <span class="plain-text">열 달의 기다림 끝에 만날</span>
+        <div class="highlight"><span>우리 아기</span></div>
+      </div>
+      <div class="text-line">
+        <div class="highlight"><span>첫번째 선물</span></div>
+        <span class="plain-text">로</span>
+      </div>
+      <div class="text-line">
+        <div class="highlight"><span>RSV 예방</span></div>
+        <span class="plain-text">을 선물해주세요!</span>
+      </div>
+    </div>
+
+    <!-- 입력창 + 버튼 -->
+    <div class="input-row">
+      <input
+        id="nicknameInput"
+        class="input-field"
+        type="text"
+        placeholder="아이의 태명을 입력해주세요"
+        maxlength="20"
+        autocomplete="off"
+        autocorrect="off"
+        autocapitalize="off"
+        spellcheck="false"
+      />
+      <button id="enterBtn" class="enter-btn" aria-label="입력 완료">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M16.01 11H4v2h12.01v3L20 12l-3.99-4v3z" fill="#ffffff"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- 토스트 -->
+  <div class="toast" id="toast"></div>
+
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+
+    const SUPABASE_URL = 'https://hmgyoqymifgcamjfacbo.supabase.co'
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhtZ3lvcXltaWZnY2FtamZhY2JvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk5NTQ0NDQsImV4cCI6MjA4NTUzMDQ0NH0.mSnpgSSQJI3AT5mztVU6TU09JK75bETPNkl_SOeN9do'
+
+    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+
+    const input = document.getElementById('nicknameInput')
+    const enterBtn = document.getElementById('enterBtn')
+    const toast = document.getElementById('toast')
+
+    let toastTimer = null
+
+    function showToast(message, duration = 2500) {
+      toast.textContent = message
+      toast.classList.add('show')
+      clearTimeout(toastTimer)
+      toastTimer = setTimeout(() => toast.classList.remove('show'), duration)
+    }
+
+    async function submitNickname() {
+      const nickname = input.value.trim()
+      if (!nickname) {
+        showToast('태명을 입력해주세요')
+        return
+      }
+
+      input.disabled = true
+      enterBtn.disabled = true
+
+      const { error } = await supabase
+        .from('baby_names')
+        .insert({ nickname })
+
+      input.disabled = false
+      enterBtn.disabled = false
+
+      if (error) {
+        console.error('저장 실패:', error.message)
+        showToast('저장에 실패했어요. 다시 시도해주세요.')
+        return
+      }
+
+      localStorage.setItem('rsv_nickname', nickname)
+      setTimeout(() => {
+        window.location.href = `event.html?name=${encodeURIComponent(nickname)}`
+      }, 800)
+    }
+
+    const originalPlaceholder = input.placeholder
+    input.addEventListener('focus', () => { input.placeholder = '' })
+    input.addEventListener('blur', () => { if (!input.value) input.placeholder = originalPlaceholder })
+
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') submitNickname()
+    })
+
+    enterBtn.addEventListener('click', () => submitNickname())
+  </script>
+</body>
+</html>

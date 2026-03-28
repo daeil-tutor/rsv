@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>RSV 예방 이벤트</title>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      width: 100%;
+      font-family: 'Pretendard', sans-serif;
+      background: #8d88ec;
+      overflow-x: hidden;
+    }
+
+
+    /* ═══════════════════════════════════════
+       EVENT INFO 섹션
+    ═══════════════════════════════════════ */
+    .event-info {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-width: 375px;
+      width: 100%;
+      padding: 40px 0;
+      overflow: clip;
+    }
+
+    .event-info-inner {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 430px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 40px;
+      padding: 0 24px;
+    }
+
+    /* 배경 레이어 */
+    .ei-bg-base    { position: absolute; inset: 0; background: #8d88ec; }
+    .ei-bg-grad    { position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(255,91,130,0) 47.416%, #ff5b82 100%); mix-blend-mode: color-burn; }
+    .ei-bg-texture { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; mix-blend-mode: multiply; pointer-events: none; }
+    .ei-bg-overlay { position: absolute; inset: 0; background: #605bbf; mix-blend-mode: color; }
+
+    /* ═══════════════════════════════════════
+       카드 공통
+    ═══════════════════════════════════════ */
+    .card {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      max-width: 500px;
+      flex-shrink: 0;
+    }
+
+    /* Vector SVG 배경 — outer wrapper */
+    .card-bg-outer {
+      position: absolute;
+      left: -4px;
+      right: -5px;
+      top: 50%;
+      transform: translateY(-50%);
+      pointer-events: none;
+    }
+
+    /* Vector SVG 배경 — inner (약간 overflow하는 이미지) */
+    .card-bg-inner {
+      position: absolute;
+    }
+
+    .card-bg-inner img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      max-width: none;
+      filter: drop-shadow(-5px -5px 0px #46428F) drop-shadow(4px 5px 0px #393584);
+    }
+
+    /* 클립 — 카드1 (직선) */
+    .clip-straight {
+      position: absolute;
+      left: 13px;
+      top: -11px;
+      width: 24px;
+      height: 39.36px;
+      z-index: 3;
+      display: block;
+    }
+
+    /* 클립 — 카드2,3 (회전 57.7°) */
+    .clip-rotated-outer {
+      position: absolute;
+      left: 1.95px;
+      top: -11.98px;
+      width: 46.09px;
+      height: 41.32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 3;
+    }
+
+    .clip-rotated-outer img {
+      width: 24px;
+      height: 39.36px;
+      transform: rotate(57.7deg);
+      flex-shrink: 0;
+      display: block;
+    }
+
+    /* 카드 콘텐츠 (Vector 위 z-index) */
+    .card-content {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* 카드 타이틀 */
+    .card-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: #413ca0;
+      letter-spacing: -1px;
+      text-align: center;
+      width: 100%;
+      min-width: 100%;
+      line-height: normal;
+    }
+
+    /* ═══════════════════════════════════════
+       카드 1 — RSV 소개
+    ═══════════════════════════════════════ */
+    .card-1 .card-content {
+      gap: 8px;
+      padding: 40px 60px;
+    }
+
+    /* 툰 이미지 목록 */
+    .toon-list {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      justify-content: center;
+      gap: 4px;
+      flex-shrink: 0;
+    }
+
+    .toon-img-wrap {
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    .toon-img-wrap img {
+      position: absolute;
+      inset: 0;
+      max-width: none;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      pointer-events: none;
+      display: block;
+    }
+
+    /* ═══════════════════════════════════════
+       카드 2 — 예방법
+    ═══════════════════════════════════════ */
+    .card-2 .card-content {
+      gap: 12px;
+      padding: 40px 28px;
+    }
+
+    /* 설명 텍스트 */
+    .desc-text {
+      font-size: 12px;
+      font-weight: 500;
+      color: #333;
+      letter-spacing: -0.48px;
+      line-height: 1.35;
+      text-align: center;
+      flex-shrink: 0;
+    }
+
+    .desc-text strong { font-weight: 700; }
+
+    /* 루틴 래퍼 */
+    .routine-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      padding-bottom: 16px;
+      flex-shrink: 0;
+      isolation: isolate;
+    }
+
+    /* 루틴 타이틀 pill */
+    .routine-title {
+      background: #27218b;
+      color: #fff;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: -0.48px;
+      padding: 6px 12px;
+      border-radius: 14px;
+      margin-bottom: -16px;
+      position: relative;
+      z-index: 2;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    /* 루틴 리스트 박스 */
+    .routine-box {
+      border: 2px solid #27218b;
+      border-radius: 12px;
+      padding: 30px 20px 12px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      position: relative;
+      z-index: 1;
+      background: #fff;
+      margin-bottom: -16px;
+      flex-shrink: 0;
+    }
+
+    /* 리스트 그룹 */
+    .info-list-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      width: 100%;
+      flex-shrink: 0;
+      align-items: flex-start;
+    }
+
+    /* 리스트 아이템 행 */
+    .info-list {
+      display: flex;
+      gap: 7px;
+      align-items: center;
+      width: 100%;
+      flex-shrink: 0;
+    }
+
+    /* 아이콘 래퍼 */
+    .icon-info {
+      background: #27218b;
+      padding: 4px;
+      border-radius: 40px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .icon-info .icon-img-wrap {
+      width: 28px;
+      height: 28px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .icon-info .icon-img-wrap img {
+      width: 28px;
+      height: 28px;
+      object-fit: contain;
+      display: block;
+    }
+
+    /* 리스트 텍스트 */
+    .info-text {
+      flex: 1 0 0;
+      min-width: 1px;
+      min-height: 1px;
+      font-size: 12px;
+      font-weight: 500;
+      color: #333;
+      letter-spacing: -0.48px;
+      line-height: normal;
+    }
+
+    .info-text strong { font-weight: 700; }
+    .info-text p { line-height: normal; margin-bottom: 0; }
+
+    /* 체크 행 */
+    .check-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      flex-shrink: 0;
+    }
+
+    .check-box-wrap {
+      display: flex;
+      align-items: center;
+      padding: 10px;
+      flex-shrink: 0;
+    }
+
+    .check-box {
+      width: 24px;
+      height: 24px;
+      border: 2px solid #605bbf;
+      border-radius: 4px;
+      background: #fff;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s, border-color 0.15s;
+      flex-shrink: 0;
+    }
+
+    .check-box.checked {
+      background: #fff;
+      border-color: #605bbf;
+    }
+
+    .check-box.checked::after {
+      content: '';
+      width: 5px;
+      height: 10px;
+      border: 2px solid #605bbf;
+      border-top: none;
+      border-left: none;
+      transform: rotate(45deg) translateY(-1px);
+      display: block;
+    }
+
+    .check-label {
+      font-size: 14px;
+      font-weight: 600;
+      color: #474747;
+      letter-spacing: -0.56px;
+      white-space: nowrap;
+    }
+
+    /* ═══════════════════════════════════════
+       카드 3 — QnA
+    ═══════════════════════════════════════ */
+    .card-3 .card-content {
+      gap: 12px;
+      padding: 40px 28px;
+    }
+
+    /* 퀴즈 질문 */
+    .quiz-question {
+      font-size: 14px;
+      font-weight: 600;
+      color: #000;
+      letter-spacing: -0.56px;
+      text-align: center;
+      line-height: 1.5;
+      white-space: pre;
+      flex-shrink: 0;
+    }
+
+    /* 퀴즈 폼 */
+    .quiz-form {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      width: 187px;
+      flex-shrink: 0;
+    }
+
+    .quiz-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      flex-shrink: 0;
+    }
+
+    .quiz-left {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      flex-shrink: 0;
+      padding: 12px 0;
+    }
+
+    .quiz-num {
+      background: #27218b;
+      color: #fff;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: -0.48px;
+      border-radius: 14px;
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 6px;
+      flex-shrink: 0;
+    }
+
+    .quiz-text {
+      font-size: 14px;
+      font-weight: 600;
+      color: #474747;
+      letter-spacing: -0.56px;
+      white-space: nowrap;
+    }
+
+    .radio-wrap {
+      display: flex;
+      align-items: center;
+      padding: 10px;
+      flex-shrink: 0;
+    }
+
+    .radio-btn {
+      width: 24px;
+      height: 24px;
+      border: 2px solid #605bbf;
+      border-radius: 24px;
+      background: #fff;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: border-color 0.15s;
+      flex-shrink: 0;
+    }
+
+    .radio-btn.selected {
+      border-color: #605bbf;
+    }
+
+    .radio-btn.selected::after {
+      content: '';
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #605bbf;
+      display: block;
+    }
+
+    /* ═══════════════════════════════════════
+       배너 섹션
+    ═══════════════════════════════════════ */
+    .banner {
+      background: #cbd9ff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      padding: 30px 0;
+      position: relative;
+      width: 100%;
+      flex-shrink: 0;
+    }
+
+    /* 배너 캐릭터: left=calc(50%-128.26px), translateX(-50%) => 시각적 left ≈ 8.4px */
+    .banner-char {
+      position: absolute;
+      left: calc(50% - 128.26px);
+      top: 48.45px;
+      transform: translateX(-50%);
+      width: 116.67px;
+      height: 100.55px;
+      object-fit: cover;
+      pointer-events: none;
+    }
+
+    /* 배너 구분선 (Vector8: h-0 + inset ±0.5px → 1px 라인) */
+    .banner-divider {
+      position: relative;
+      height: 0;
+      width: 100%;
+      flex-shrink: 0;
+    }
+
+    .banner-divider::after {
+      content: '';
+      position: absolute;
+      top: -0.5px;
+      bottom: -0.5px;
+      left: 0;
+      right: 0;
+      background: rgba(99, 92, 219, 0.35);
+    }
+
+    /* 배너 텍스트 */
+    .banner-text {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      font-size: 16px;
+      font-weight: 600;
+      color: #635cdb;
+      letter-spacing: -0.64px;
+      line-height: normal;
+      width: 100%;
+      flex-shrink: 0;
+    }
+
+    .banner-name-line {
+      display: flex;
+      gap: 4px;
+      align-items: center;
+      justify-content: center;
+      white-space: nowrap;
+      width: 100%;
+      flex-shrink: 0;
+    }
+
+    /* CTA 버튼 */
+    .cta-btn {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 24px;
+      border-radius: 14px;
+      font-family: 'Pretendard', sans-serif;
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: -0.64px;
+      white-space: nowrap;
+      background: #f0f0f0;
+      border: 2px solid #dbdada;
+      color: #dbdada;
+      cursor: not-allowed;
+      transition: background 0.2s, color 0.2s, border-color 0.2s;
+      flex-shrink: 0;
+    }
+
+    .cta-btn.active {
+      background: #423da1;
+      border-color: #423da1;
+      color: #fff;
+      cursor: pointer;
+    }
+
+    .cta-btn.active:active {
+      background: #332e8a;
+    }
+
+    /* 팝업 dim */
+    .popup-dim {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+    }
+    .popup-dim.show {
+      display: flex;
+    }
+
+    /* incorrect popup */
+    .incorrect-popup {
+      background: #fff;
+      border-radius: 16px;
+      width: 300px;
+      padding: 25px 20px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      position: relative;
+    }
+
+    .incorrect-popup-text {
+      font-size: 16px;
+      font-weight: 600;
+      color: rgba(69, 69, 69, 1);
+      letter-spacing: -0.8px;
+      line-height: 1.5;
+      text-align: center;
+      width: 100%;
+    }
+
+    .incorrect-retry-btn {
+      padding: 10px;
+      width: 100%;
+      font-size: 16px;
+      font-weight: 600;
+      color: #635cdb;
+      letter-spacing: -0.8px;
+      line-height: 1.5;
+      text-align: center;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════
+     이벤트 인포 섹션
+═══════════════════════════════════════ -->
+<section class="event-info">
+  <div class="ei-bg-base" aria-hidden="true"></div>
+  <div class="ei-bg-grad" aria-hidden="true"></div>
+  <img class="ei-bg-texture" src="https://hmgyoqymifgcamjfacbo.supabase.co/storage/v1/object/public/RSV/img/background%20texture.png" alt="" aria-hidden="true" />
+  <div class="ei-bg-overlay" aria-hidden="true"></div>
+
+  <div class="event-info-inner">
+
+  <!-- ── 카드 1: RSV에 대해 알고 계신가요? ─── -->
+  <div class="card card-1">
+    <!-- Vector 1 배경 (h=483, outer: left=-4 right=-5, inner: inset -1.04% -1.14%) -->
+    <div class="card-bg-outer" style="height: 483.001px;">
+      <div class="card-bg-inner" style="top:-1.04%; right:-1.14%; bottom:-1.04%; left:-1.42%;">
+        <img src="https://hmgyoqymifgcamjfacbo.supabase.co/storage/v1/object/public/RSV/img/Vector%201.svg" alt="" />
+      </div>
+    </div>
+    <!-- 클립 (직선) -->
+    <img class="clip-straight" src="https://hmgyoqymifgcamjfacbo.supabase.co/storage/v1/object/public/RSV/img/clip.svg" alt="" />
+
+    <div class="card-content">
+      <p class="card-title">RSV에 대해 알고 계신가요?</p>
+      <div class="toon-list">
+        <!-- toon 1: 226×121.483 -->
+        <div class="toon-img-wrap" style="width:226px; height:121.483px;">
+          <img src="https://hmgyoqymifgcamjfacbo.supabase.co/storage/v1/object/public/RSV/img/toon%201.png" alt="RSV 소개 1" />
+        </div>
+        <!-- toon 2: 220×113.735 -->
+        <div class="toon-img-wrap" style="width:220px; height:113.735px;">
+          <img src="https://hmgyoqymifgcamjfacbo.supabase.co/storage/v1/object/public/RSV/img/toon%202.png" alt="RSV 소개 2" />
+        </div>
+        <!-- toon 3: 220×114.074 -->
+        <div class="toon-img-wrap" style="width:220px; height:114.074px;">
+          <img src="https://hmgyoqymifgcamjfacbo.supabase.co/storage/v1/object/public/RSV/img/toon%203.png" alt="RSV 소개 3" />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 카드 2: RSV 예방법은 무엇인가요? ─── -->
+  <div class="card card-2">
+    <!-- Vector 2 배경 (h=677.292, outer: left=-4 right=-5, inner: inset -0.74% -1.14%) -->
+    <div class="card-bg-outer" style="height: 677.292px; top: calc(50% - 0.35px);">
+      <div class="card-bg-inner" style="top:-0.74%; right:-1.14%; bottom:-0.74%; left:-1.42%;">
+        <img src="https://hmgyoqymifgcamjfacbo.supabase.co/storage/v1/object/public/RSV/img/Vector%202.svg" alt="" />
+      </div>
+    </div>
+    <!-- 클립 (회전 57.7°) -->
+    <div class="clip-rotated-outer">
+      <img src="https://hmgyoqymifgcamjfacbo.supabase.co/storage/v1/object/public/RSV/img/clip.svg" alt="" />
+    </div>
+
+    <div class="card-content">
+      <p class="card-title">RSV 예방법은 무엇인가요?</p>
+
+      <p class="desc-text">RSV는 <strong>개인 위생 수칙 준수</strong>를 통해 <strong>예방</strong>할 수 있습니다.<br />RSV 예방을 위한 <strong>일상 속 건강한 습관</strong>을 지켜주세요!</p>
+
+      <!-- 루틴 1: 개인 위생 수칙 -->
+      <div class="routine-wrap">
+        <div class="routine-title">하나, 개인 위생 수칙</div>
+        <div class="routine-box">
+          <div class="info-list-group">
+            <div class="info-list">
+              <div class="icon-info">
+                <div class="icon-img-wrap">
+                  <img src="https://hmgyoqymifgcamjfacbo.supabase.co/storage/v1/object/public/RSV/icon/wash.svg" alt="" />
+                </div>
+              </div>
+              <p class="info-text">30초 이상 흐르는 물에 손 씻기!</p>
+            </div>
+            <div class="info-list">
+              <div class="icon-info">
+                <div class="icon-img-wrap">
+                  <img src="https://hmgyoqymifgcamjfacbo.supabase.co/storage/v1/object/public/RSV/icon/teddy.svg" alt="" />
+                </div>
+              </div>
+              <div class="info-text">
+                <p style="line-height:normal; margin-bottom:0;">장난감, 식기등</p>
+                <p style="line-height:normal;">자주 만지는 물건 소독하기!</p>
+              </div>
+            </div>
+            <div class="info-list">
+              <div class="icon-info">
+                <div class="icon-img-wrap">
+                  <img src="https://hmgyoqymifgcamjfacbo.supabase.co/storage/v1/object/public/RSV/icon/thermometer.svg" alt="" />
+                </div>
+              </div>
+              <div class="info-text">
+                <p>감기와 유사한 증상이 있는 사람과의</p>
+                <p>밀접 접촉 피하기!</p>
+              </div>
+            </div>
+            <div class="info-list">
+              <div class="icon-info">
+                <div class="icon-img-wrap">
+                  <img src="https://hmgyoqymifgcamjfacbo.supabase.co/storage/v1/object/public/RSV/icon/cough.svg" alt="" />
+                </div>
+              </div>
+              <p class="info-text">기침할 때는 얼굴 가리기!</p>
+            </div>
+          </div>
+          <div class="check-row" onclick="toggleCheck(1)">
+            <div class="check-box-wrap">
+              <div class="check-box" id="check1"></div>
+            </div>
+            <span class="check-label">네, 확인했습니다.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 루틴 2: RSV 예방 주사 -->
+      <div class="routine-wrap">
+        <div class="routine-title">둘, RSV 예방 주사</div>
+        <div class="routine-box">
+          <div class="info-list-group">
+            <div class="info-list">
+              <div class="icon-info">
+                <div class="icon-img-wrap">
+                  <img src="https://hmgyoqymifgcamjfacbo.supabase.co/storage/v1/object/public/RSV/icon/baby.svg" alt="" />
+                </div>
+              </div>
+              <div class="info-text">
+                <p style="line-height:normal; margin-bottom:0;">영아 및 신생아를 대상으로 접종 가능한</p>
+                <p style="line-height:normal;">RSV 예방주사도 활용되고 있습니다.</p>
+              </div>
+            </div>
+            <div class="info-list">
+              <div class="icon-info">
+                <div class="icon-img-wrap">
+                  <img src="https://hmgyoqymifgcamjfacbo.supabase.co/storage/v1/object/public/RSV/icon/injection.svg" alt="" />
+                </div>
+              </div>
+              <p class="info-text">RSV 비시즌인 <strong>4월~9월에 태어난 아기들은</strong> RSV 시즌 (10월~3월)이 시작하기 직전인 <strong>9월 말부터 접종</strong>을 시작합니다.</p>
+            </div>
+          </div>
+          <div class="check-row" onclick="toggleCheck(2)">
+            <div class="check-box-wrap">
+              <div class="check-box" id="check2"></div>
+            </div>
+            <span class="check-label">네, 확인했습니다.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 카드 3: QnA ──────────────────────── -->
+
+  <div class="card card-3">
+    <!-- Vector 3 배경 (h=273.292, outer: left=-4 right=-5, inner: inset -1.83% -1.14%) -->
+    <div class="card-bg-outer" style="height: 273.292px; top: calc(50% - 0.35px);">
+      <div class="card-bg-inner" style="top:-1.83%; right:-1.14%; bottom:-1.83%; left:-1.42%;">
+        <img src="https://hmgyoqymifgcamjfacbo.supabase.co/storage/v1/object/public/RSV/img/Vector%203.svg" alt="" />
+      </div>
+    </div>
+    <!-- 클립 (회전 57.7°) -->
+    <div class="clip-rotated-outer">
+      <img src="https://hmgyoqymifgcamjfacbo.supabase.co/storage/v1/object/public/RSV/img/clip.svg" alt="" />
+    </div>
+
+    <div class="card-content">
+      <div class="routine-wrap">
+        <div class="routine-title">QnA</div>
+        <div class="routine-box">
+          <div class="quiz-question">RSV 비시즌인 4월~9월에 태어난 아기들은
+언제 접종을 해야할까요?</div>
+          <div class="quiz-form">
+            <div class="quiz-item" onclick="selectQuiz(1)">
+              <div class="quiz-left">
+                <div class="quiz-num">1</div>
+                <span class="quiz-text">태어나자 마자 접종</span>
+              </div>
+              <div class="radio-wrap">
+                <div class="radio-btn" id="radio1"></div>
+              </div>
+            </div>
+            <div class="quiz-item" onclick="selectQuiz(2)">
+              <div class="quiz-left">
+                <div class="quiz-num">2</div>
+                <span class="quiz-text">9월 말 부터 접종</span>
+              </div>
+              <div class="radio-wrap">
+                <div class="radio-btn" id="radio2"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  </div><!-- /.event-info-inner -->
+</section>
+
+<!-- incorrect popup -->
+<div class="popup-dim" id="incorrectDim" onclick="closeIncorrectPopup()">
+  <div class="incorrect-popup" onclick="event.stopPropagation()">
+    <p class="incorrect-popup-text">
+      아이를 위한 중요한 정보인 만큼,<br />다시 한 번 읽고 정답을 선택해주세요!
+    </p>
+    <div class="incorrect-retry-btn" onclick="closeIncorrectPopup()">다시 문제 풀기</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     배너 섹션
+═══════════════════════════════════════ -->
+<section class="banner">
+  <!-- 배너 캐릭터: left=calc(50%-128.26px) + translateX(-50%) → 시각적 left≈8.4px -->
+  <img class="banner-char"
+    src="https://hmgyoqymifgcamjfacbo.supabase.co/storage/v1/object/public/RSV/img/banner%20img.png"
+    alt="" />
+
+  <!-- 상단 구분선 (Vector 2, y=30) -->
+  <div class="banner-divider"></div>
+
+  <!-- 배너 텍스트 -->
+  <div class="banner-text">
+    <div class="banner-name-line">
+      <span>사랑하는</span>
+      <span style="display:flex; align-items:center;">
+        <span id="userName">아기</span><span id="particle">을</span>
+      </span>
+      <span>위한</span>
+    </div>
+    <span style="text-align:center; width:100%;">RSV 예방 교육 완료!</span>
+  </div>
+
+  <!-- CTA 버튼 -->
+  <button class="cta-btn" id="ctaBtn">경품 응모하러 가기</button>
+
+  <!-- 하단 구분선 (Vector 1, y=149) -->
+  <div class="banner-divider"></div>
+</section>
+
+<script>
+  /* ── 태명 + 조사 ─────────────────────────── */
+  const params   = new URLSearchParams(window.location.search)
+  const nickname = params.get('name') || localStorage.getItem('rsv_nickname') || '아기'
+  document.getElementById('userName').textContent = nickname
+
+  function getParticle(str) {
+    const last = str[str.length - 1]
+    const code = last.charCodeAt(0) - 0xAC00
+    if (code < 0 || code > 11171) return '을'
+    return (code % 28) === 0 ? '를' : '을'
+  }
+  document.getElementById('particle').textContent = getParticle(nickname)
+
+  /* ── 상태 ───────────────────────────────── */
+  let checked1 = false, checked2 = false, quizSelected = null
+  const CORRECT = 2
+
+  function toggleCheck(n) {
+    if (n === 1) { checked1 = !checked1; document.getElementById('check1').classList.toggle('checked', checked1) }
+    else         { checked2 = !checked2; document.getElementById('check2').classList.toggle('checked', checked2) }
+    updateCta()
+  }
+
+  function selectQuiz(n) {
+    if (n !== CORRECT) {
+      document.getElementById('incorrectDim').classList.add('show')
+      return
+    }
+    quizSelected = n
+    document.getElementById('radio1').className = 'radio-btn'
+    document.getElementById('radio2').className = 'radio-btn selected'
+    updateCta()
+  }
+
+  function closeIncorrectPopup() {
+    document.getElementById('incorrectDim').classList.remove('show')
+    document.getElementById('radio1').className = 'radio-btn'
+    document.getElementById('radio2').className = 'radio-btn'
+    if (quizSelected !== CORRECT) quizSelected = null
+    updateCta()
+  }
+
+  function updateCta() {
+    const done = checked1 && checked2 && quizSelected === CORRECT
+    document.getElementById('ctaBtn').className = 'cta-btn' + (done ? ' active' : '')
+  }
+
+  document.getElementById('ctaBtn').addEventListener('click', () => {
+    if (document.getElementById('ctaBtn').classList.contains('active')) {
+      window.location.href = 'https://forms.gle/hhy4sPiN2qqENz287'
+    }
+  })
+</script>
+</body>
+</html>
