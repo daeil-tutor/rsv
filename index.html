@@ -36,7 +36,7 @@
       align-items: center;
       justify-content: flex-start;
       gap: 58px;
-      padding: 200px 24px;
+      padding: 140px 24px;
       overflow: hidden;
     }
 
@@ -74,8 +74,8 @@
     .baby-image-wrap {
       position: absolute;
       bottom: 0;
-      left: -20px;
-      right: -20px;
+      left: -19.99px;
+      right: -19.99px;
       aspect-ratio: 1217 / 860;
     }
 
@@ -191,8 +191,8 @@
     }
 
     .enter-btn svg {
-      width: 28px;
-      height: 28px;
+      width: 28.909px;
+      height: 28.909px;
     }
 
     /* 토스트 메시지 */
@@ -308,65 +308,87 @@
   <!-- 토스트 -->
   <div class="toast" id="toast"></div>
 
-  <script type="module">
-    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+  <script>
+    (function () {
+      var SUPABASE_URL = 'https://hmgyoqymifgcamjfacbo.supabase.co'
+      var SUPABASE_ANON_KEY =
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhtZ3lvcXltaWZnY2FtamZhY2JvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk5NTQ0NDQsImV4cCI6MjA4NTUzMDQ0NH0.mSnpgSSQJI3AT5mztVU6TU09JK75bETPNkl_SOeN9do'
+      var REST_INSERT_URL = SUPABASE_URL + '/rest/v1/baby_names'
 
-    const SUPABASE_URL = 'https://hmgyoqymifgcamjfacbo.supabase.co'
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhtZ3lvcXltaWZnY2FtamZhY2JvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk5NTQ0NDQsImV4cCI6MjA4NTUzMDQ0NH0.mSnpgSSQJI3AT5mztVU6TU09JK75bETPNkl_SOeN9do'
+      var input = document.getElementById('nicknameInput')
+      var enterBtn = document.getElementById('enterBtn')
+      var toast = document.getElementById('toast')
+      var toastTimer = null
 
-    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
-
-    const input = document.getElementById('nicknameInput')
-    const enterBtn = document.getElementById('enterBtn')
-    const toast = document.getElementById('toast')
-
-    let toastTimer = null
-
-    function showToast(message, duration = 2500) {
-      toast.textContent = message
-      toast.classList.add('show')
-      clearTimeout(toastTimer)
-      toastTimer = setTimeout(() => toast.classList.remove('show'), duration)
-    }
-
-    async function submitNickname() {
-      const nickname = input.value.trim()
-      if (!nickname) {
-        showToast('태명을 입력해주세요')
-        return
+      function showToast(message, duration) {
+        duration = duration !== undefined ? duration : 2500
+        toast.textContent = message
+        toast.classList.add('show')
+        clearTimeout(toastTimer)
+        toastTimer = setTimeout(function () {
+          toast.classList.remove('show')
+        }, duration)
       }
 
-      input.disabled = true
-      enterBtn.disabled = true
+      async function submitNickname() {
+        var nickname = input.value.trim()
+        if (!nickname) {
+          showToast('태명을 입력해주세요')
+          return
+        }
 
-      const { error } = await supabase
-        .from('baby_names')
-        .insert({ nickname })
+        input.disabled = true
+        enterBtn.disabled = true
 
-      input.disabled = false
-      enterBtn.disabled = false
+        try {
+          var res = await fetch(REST_INSERT_URL, {
+            method: 'POST',
+            headers: {
+              apikey: SUPABASE_ANON_KEY,
+              Authorization: 'Bearer ' + SUPABASE_ANON_KEY,
+              'Content-Type': 'application/json',
+              Prefer: 'return=minimal'
+            },
+            body: JSON.stringify({ name: nickname })
+          })
 
-      if (error) {
-        console.error('저장 실패:', error.message)
-        showToast('저장에 실패했어요. 다시 시도해주세요.')
-        return
+          if (!res.ok) {
+            var errText = await res.text()
+            console.error('Supabase REST', res.status, errText)
+            showToast('저장에 실패했어요. 다시 시도해주세요.')
+            return
+          }
+
+          localStorage.setItem('rsv_nickname', nickname)
+          setTimeout(function () {
+            window.location.href =
+              'event.html?name=' + encodeURIComponent(nickname)
+          }, 800)
+        } catch (e) {
+          console.error(e)
+          showToast('네트워크 오류가 났어요. 다시 시도해주세요.')
+        } finally {
+          input.disabled = false
+          enterBtn.disabled = false
+        }
       }
 
-      localStorage.setItem('rsv_nickname', nickname)
-      setTimeout(() => {
-        window.location.href = `event.html?name=${encodeURIComponent(nickname)}`
-      }, 800)
-    }
+      var originalPlaceholder = input.placeholder
+      input.addEventListener('focus', function () {
+        input.placeholder = ''
+      })
+      input.addEventListener('blur', function () {
+        if (!input.value) input.placeholder = originalPlaceholder
+      })
 
-    const originalPlaceholder = input.placeholder
-    input.addEventListener('focus', () => { input.placeholder = '' })
-    input.addEventListener('blur', () => { if (!input.value) input.placeholder = originalPlaceholder })
+      input.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') submitNickname()
+      })
 
-    input.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') submitNickname()
-    })
-
-    enterBtn.addEventListener('click', () => submitNickname())
+      enterBtn.addEventListener('click', function () {
+        submitNickname()
+      })
+    })()
   </script>
 </body>
 </html>
