@@ -225,6 +225,27 @@
       opacity: 0.6;
       cursor: not-allowed;
     }
+
+    /* 기업 로고 (Figma: corp logo) */
+    .corp-logo {
+      position: absolute;
+      bottom: 50px;
+      left: calc(50% + 13.05px);
+      transform: translateX(-50%);
+      width: 200px;
+      height: 26.779px;
+      overflow: hidden;
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    .corp-logo img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      object-position: center;
+    }
   </style>
 </head>
 <body>
@@ -274,6 +295,13 @@
           <path d="M16.01 11H4v2h12.01v3L20 12l-3.99-4v3z" fill="#ffffff"/>
         </svg>
       </button>
+    </div>
+
+    <div class="corp-logo" aria-hidden="true">
+      <img
+        src="https://hmgyoqymifgcamjfacbo.supabase.co/storage/v1/object/public/RSV/img/corp%20logo.svg"
+        alt=""
+      />
     </div>
   </div>
 
