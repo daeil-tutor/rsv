@@ -25,22 +25,25 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      min-width: 375px;
+      min-width: 0;
       width: 100%;
       padding: 40px 0;
-      overflow: clip;
+      overflow-x: hidden;
+      overflow-y: visible;
     }
 
+    /* 375~550px: 카드 폭에 맞춰 Vector·툰 비율 유지 (Figma 550 기준) */
     .event-info-inner {
       position: relative;
       z-index: 1;
       width: 100%;
-      max-width: 430px;
+      max-width: 500px;
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 40px;
       padding: 0 24px;
+      box-sizing: border-box;
     }
 
     /* 배경 레이어 */
@@ -58,25 +61,53 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
+      justify-content: flex-start;
       width: 100%;
       max-width: 500px;
       flex-shrink: 0;
+      overflow: visible;
     }
 
-    /* Vector SVG 배경 — outer wrapper */
+    /*
+      Vector 배경: 세로 중앙 정렬(translateY -50%)을 쓰면 제목·그리드가 어긋남.
+      카드 높이만큼 위에서 아래로 덮도록 stretch (top:0; bottom:0).
+    */
     .card-bg-outer {
       position: absolute;
       left: -4px;
       right: -5px;
-      top: 50%;
-      transform: translateY(-50%);
+      top: 0;
+      bottom: 0;
+      transform: none;
       pointer-events: none;
+      min-height: 100%;
     }
 
-    /* Vector SVG 배경 — inner (약간 overflow하는 이미지) */
+    /* Vector SVG 배경 — inner (기존 Figma inset, SVG 자산과 정합) */
     .card-bg-inner {
       position: absolute;
+      inset: 0;
+    }
+
+    .card-1 .card-bg-inner {
+      top: -1.04%;
+      right: -1.14%;
+      bottom: -1.04%;
+      left: -1.42%;
+    }
+
+    .card-2 .card-bg-inner {
+      top: -0.74%;
+      right: -1.14%;
+      bottom: -0.74%;
+      left: -1.42%;
+    }
+
+    .card-3 .card-bg-inner {
+      top: -1.83%;
+      right: -1.14%;
+      bottom: -1.83%;
+      left: -1.42%;
     }
 
     .card-bg-inner img {
@@ -84,6 +115,8 @@
       width: 100%;
       height: 100%;
       max-width: none;
+      object-fit: cover;
+      object-position: center top;
       filter: drop-shadow(-5px -5px 0px #46428F) drop-shadow(4px 5px 0px #393584);
     }
 
@@ -127,7 +160,7 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
+      justify-content: flex-start;
     }
 
     /* 카드 타이틀 */
@@ -147,7 +180,8 @@
     ═══════════════════════════════════════ */
     .card-1 .card-content {
       gap: 8px;
-      padding: 40px 60px;
+      /* 제목이 그리드 흰 영역 안으로 들어가도록 상단 여유 */
+      padding: 48px 24px 40px;
     }
 
     /* 툰 이미지 목록 */
@@ -158,11 +192,35 @@
       justify-content: center;
       gap: 4px;
       flex-shrink: 0;
+      width: 100%;
     }
 
     .toon-img-wrap {
       position: relative;
       flex-shrink: 0;
+    }
+
+    .toon-img-wrap.toon-aspect-2,
+    .toon-img-wrap.toon-aspect-3 {
+      width: 100%;
+      max-width: 100%;
+      height: auto;
+    }
+
+    .toon-img-wrap.toon-aspect-2 {
+      aspect-ratio: 648 / 335;
+    }
+
+    .toon-img-wrap.toon-aspect-3 {
+      aspect-ratio: 648 / 336;
+    }
+
+    /* 툰1: 550 프레임 비율, 좁은 폭에서 축소 */
+    .toon-img-wrap.toon-1 {
+      width: 100%;
+      max-width: 464.622px;
+      aspect-ratio: 464.622 / 249.752;
+      height: auto;
     }
 
     .toon-img-wrap img {
@@ -176,23 +234,34 @@
       display: block;
     }
 
+    /* toon 1: cover는 비율 불일치 시 가장자리가 잘림 → 전체 표시 */
+    .toon-img-wrap.toon-1 img {
+      object-fit: contain;
+      object-position: center;
+    }
+
     /* ═══════════════════════════════════════
        카드 2 — 예방법
     ═══════════════════════════════════════ */
     .card-2 .card-content {
       gap: 12px;
-      padding: 40px 28px;
+      padding: 44px 20px 40px;
     }
 
-    /* 설명 텍스트 */
+    /* 설명 텍스트 (Figma: 14px, -0.56px) */
     .desc-text {
-      font-size: 12px;
+      font-size: 14px;
       font-weight: 500;
       color: #333;
-      letter-spacing: -0.48px;
+      letter-spacing: -0.56px;
       line-height: 1.35;
       text-align: center;
       flex-shrink: 0;
+    }
+
+    .desc-text .desc-line {
+      margin: 0;
+      line-height: 1.35;
     }
 
     .desc-text strong { font-weight: 700; }
@@ -208,13 +277,13 @@
       isolation: isolate;
     }
 
-    /* 루틴 타이틀 pill */
+    /* 루틴 타이틀 pill (Figma: 15px Bold, -0.6px) */
     .routine-title {
       background: #27218b;
       color: #fff;
-      font-size: 12px;
+      font-size: 15px;
       font-weight: 700;
-      letter-spacing: -0.48px;
+      letter-spacing: -0.6px;
       padding: 6px 12px;
       border-radius: 14px;
       margin-bottom: -16px;
@@ -239,19 +308,31 @@
       background: #fff;
       margin-bottom: -16px;
       flex-shrink: 0;
+      overflow: hidden;
     }
 
-    /* 리스트 그룹 */
+    /* 체크바가 있는 루틴 박스 (Figma: 리스트는 좌우 20px, 하단 체크는 풀폭 #27218b + 라벨 흰색) */
+    .routine-box:has(.check-row) {
+      padding: 30px 0 0;
+      gap: 16px;
+    }
+
+    .routine-box:has(.check-row) .info-list-group {
+      padding: 0 20px;
+      width: 100%;
+    }
+
+    /* 리스트 그룹 (Figma: gap 18px) */
     .info-list-group {
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 18px;
       width: 100%;
       flex-shrink: 0;
       align-items: flex-start;
     }
 
-    /* 리스트 아이템 행 */
+    /* 리스트 아이템 행: 아이콘을 텍스트 블록(한 줄·여러 줄) 세로 중앙에 */
     .info-list {
       display: flex;
       gap: 7px;
@@ -288,30 +369,49 @@
       display: block;
     }
 
-    /* 리스트 텍스트 */
+    /* 리스트 텍스트 (Figma: 15px Medium, -0.6px) */
     .info-text {
       flex: 1 0 0;
       min-width: 1px;
       min-height: 1px;
-      font-size: 12px;
+      font-size: 15px;
       font-weight: 500;
       color: #333;
-      letter-spacing: -0.48px;
+      letter-spacing: -0.6px;
       line-height: normal;
     }
 
     .info-text strong { font-weight: 700; }
     .info-text p { line-height: normal; margin-bottom: 0; }
 
-    /* 체크 행 */
+    /* 체크 행: 체크박스와 라벨 세로 중앙 정렬 */
     .check-row {
       display: flex;
       align-items: center;
-      justify-content: center;
+      justify-content: flex-start;
       cursor: pointer;
       -webkit-tap-highlight-color: transparent;
       user-select: none;
       flex-shrink: 0;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .routine-box:has(.check-row) .check-row {
+      background: #27218b;
+      padding: 4px 10px;
+      margin-top: 0;
+    }
+
+    .routine-box:has(.check-row) .check-label {
+      color: #fff;
+      font-size: 16px;
+      letter-spacing: -0.64px;
+      white-space: normal;
+      word-break: keep-all;
+      line-height: 1.35;
+      flex: 1;
+      min-width: 0;
     }
 
     .check-box-wrap {
@@ -364,18 +464,20 @@
     ═══════════════════════════════════════ */
     .card-3 .card-content {
       gap: 12px;
-      padding: 40px 28px;
+      padding: 44px 20px 40px;
     }
 
-    /* 퀴즈 질문 */
+    /* 퀴즈 질문 (Figma: 15px, -0.6px) */
     .quiz-question {
-      font-size: 14px;
+      font-size: 15px;
       font-weight: 600;
       color: #000;
-      letter-spacing: -0.56px;
+      letter-spacing: -0.6px;
       text-align: center;
       line-height: 1.5;
-      white-space: pre;
+      white-space: pre-wrap;
+      word-break: keep-all;
+      max-width: 100%;
       flex-shrink: 0;
     }
 
@@ -383,8 +485,11 @@
     .quiz-form {
       display: flex;
       flex-direction: column;
-      align-items: flex-start;
-      width: 187px;
+      align-items: stretch;
+      width: min(100%, 280px);
+      max-width: 100%;
+      margin-left: auto;
+      margin-right: auto;
       flex-shrink: 0;
     }
 
@@ -393,6 +498,7 @@
       align-items: center;
       justify-content: space-between;
       width: 100%;
+      gap: 8px;
       cursor: pointer;
       -webkit-tap-highlight-color: transparent;
       user-select: none;
@@ -403,7 +509,8 @@
       display: flex;
       gap: 6px;
       align-items: center;
-      flex-shrink: 0;
+      flex: 1;
+      min-width: 0;
       padding: 12px 0;
     }
 
@@ -424,16 +531,18 @@
     }
 
     .quiz-text {
-      font-size: 14px;
+      font-size: 15px;
       font-weight: 600;
       color: #474747;
-      letter-spacing: -0.56px;
-      white-space: nowrap;
+      letter-spacing: -0.6px;
+      white-space: normal;
+      word-break: keep-all;
     }
 
     .radio-wrap {
       display: flex;
       align-items: center;
+      align-self: center;
       padding: 10px;
       flex-shrink: 0;
     }
@@ -474,10 +583,14 @@
       flex-direction: column;
       align-items: center;
       gap: 12px;
-      padding: 30px 0;
+      padding: 30px 16px;
+      padding-left: max(16px, env(safe-area-inset-left));
+      padding-right: max(16px, env(safe-area-inset-right));
       position: relative;
       width: 100%;
+      max-width: 100%;
       flex-shrink: 0;
+      box-sizing: border-box;
     }
 
     /* 배너 캐릭터: left=calc(50%-128.26px), translateX(-50%) => 시각적 left ≈ 8.4px */
@@ -530,11 +643,14 @@
 
     .banner-name-line {
       display: flex;
+      flex-wrap: wrap;
       gap: 4px;
       align-items: center;
       justify-content: center;
-      white-space: nowrap;
+      white-space: normal;
+      word-break: keep-all;
       width: 100%;
+      max-width: 100%;
       flex-shrink: 0;
     }
 
@@ -589,6 +705,21 @@
       object-position: center;
     }
 
+    .banner-legal {
+      position: relative;
+      z-index: 1;
+      font-size: 12px;
+      font-weight: 400;
+      color: #676767;
+      letter-spacing: -0.48px;
+      text-align: center;
+      line-height: normal;
+      white-space: normal;
+      word-break: break-all;
+      max-width: 100%;
+      flex-shrink: 0;
+    }
+
     /* 팝업 dim */
     .popup-dim {
       display: none;
@@ -607,13 +738,15 @@
     .incorrect-popup {
       background: #fff;
       border-radius: 16px;
-      width: 300px;
+      width: min(300px, calc(100vw - 32px));
+      max-width: 100%;
       padding: 25px 20px 20px;
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 8px;
       position: relative;
+      box-sizing: border-box;
     }
 
     .incorrect-popup-text {
@@ -656,9 +789,9 @@
 
   <!-- ── 카드 1: RSV에 대해 알고 계신가요? ─── -->
   <div class="card card-1">
-    <!-- Vector 1 배경 (h=483, outer: left=-4 right=-5, inner: inset -1.04% -1.14%) -->
-    <div class="card-bg-outer" style="height: 483.001px;">
-      <div class="card-bg-inner" style="top:-1.04%; right:-1.14%; bottom:-1.04%; left:-1.42%;">
+    <!-- Vector 1 배경 (카드 전체 높이에 맞춤) -->
+    <div class="card-bg-outer">
+      <div class="card-bg-inner">
         <img src="https://hmgyoqymifgcamjfacbo.supabase.co/storage/v1/object/public/RSV/img/Vector%201.svg" alt="" />
       </div>
     </div>
@@ -668,16 +801,15 @@
     <div class="card-content">
       <p class="card-title">RSV에 대해 알고 계신가요?</p>
       <div class="toon-list">
-        <!-- toon 1: 226×121.483 -->
-        <div class="toon-img-wrap" style="width:226px; height:121.483px;">
+        <!-- toon 1: 비율 유지·가로 축소 (550 기준 max 464.622px) -->
+        <div class="toon-img-wrap toon-1">
           <img src="https://hmgyoqymifgcamjfacbo.supabase.co/storage/v1/object/public/RSV/img/toon%201.png" alt="RSV 소개 1" />
         </div>
-        <!-- toon 2: 220×113.735 -->
-        <div class="toon-img-wrap" style="width:220px; height:113.735px;">
+        <!-- toon 2·3: Figma aspect 648/335, 648/336, full width -->
+        <div class="toon-img-wrap toon-aspect-2">
           <img src="https://hmgyoqymifgcamjfacbo.supabase.co/storage/v1/object/public/RSV/img/toon%202.png" alt="RSV 소개 2" />
         </div>
-        <!-- toon 3: 220×114.074 -->
-        <div class="toon-img-wrap" style="width:220px; height:114.074px;">
+        <div class="toon-img-wrap toon-aspect-3">
           <img src="https://hmgyoqymifgcamjfacbo.supabase.co/storage/v1/object/public/RSV/img/toon%203.png" alt="RSV 소개 3" />
         </div>
       </div>
@@ -686,9 +818,9 @@
 
   <!-- ── 카드 2: RSV 예방법은 무엇인가요? ─── -->
   <div class="card card-2">
-    <!-- Vector 2 배경 (h=677.292, outer: left=-4 right=-5, inner: inset -0.74% -1.14%) -->
-    <div class="card-bg-outer" style="height: 677.292px; top: calc(50% - 0.35px);">
-      <div class="card-bg-inner" style="top:-0.74%; right:-1.14%; bottom:-0.74%; left:-1.42%;">
+    <!-- Vector 2 배경 -->
+    <div class="card-bg-outer">
+      <div class="card-bg-inner">
         <img src="https://hmgyoqymifgcamjfacbo.supabase.co/storage/v1/object/public/RSV/img/Vector%202.svg" alt="" />
       </div>
     </div>
@@ -700,7 +832,10 @@
     <div class="card-content">
       <p class="card-title">RSV 예방법은 무엇인가요?</p>
 
-      <p class="desc-text">RSV는 <strong>개인 위생 수칙 준수</strong>를 통해 <strong>예방</strong>할 수 있습니다.<br />RSV 예방을 위한 <strong>일상 속 건강한 습관</strong>을 지켜주세요!</p>
+      <div class="desc-text">
+        <p class="desc-line">RSV는 <strong>개인 위생 수칙 준수</strong>를 통해 <strong>예방</strong>할 수 있습니다.</p>
+        <p class="desc-line">RSV 예방을 위한 <strong>일상 속 건강한 습관</strong>을 지켜주세요!</p>
+      </div>
 
       <!-- 루틴 1: 개인 위생 수칙 -->
       <div class="routine-wrap">
@@ -750,7 +885,7 @@
             <div class="check-box-wrap">
               <div class="check-box" id="check1"></div>
             </div>
-            <span class="check-label">네, 확인했습니다.</span>
+            <span class="check-label">네, 꼭 기억할게요!</span>
           </div>
         </div>
       </div>
@@ -766,10 +901,7 @@
                   <img src="https://hmgyoqymifgcamjfacbo.supabase.co/storage/v1/object/public/RSV/icon/baby.svg" alt="" />
                 </div>
               </div>
-              <div class="info-text">
-                <p style="line-height:normal; margin-bottom:0;">영아 및 신생아를 대상으로 접종 가능한</p>
-                <p style="line-height:normal;">RSV 예방주사도 활용되고 있습니다.</p>
-              </div>
+              <p class="info-text">신생아 및 영아 대상 RSV 예방 주사 접종</p>
             </div>
             <div class="info-list">
               <div class="icon-info">
@@ -777,14 +909,14 @@
                   <img src="https://hmgyoqymifgcamjfacbo.supabase.co/storage/v1/object/public/RSV/icon/injection.svg" alt="" />
                 </div>
               </div>
-              <p class="info-text">RSV 비시즌인 <strong>4월~9월에 태어난 아기들은</strong> RSV 시즌 (10월~3월)이 시작하기 직전인 <strong>9월 말부터 접종</strong>을 시작합니다.</p>
+              <p class="info-text"><strong>4월 ~ 9월에 태어난 아기들</strong>은 RSV 시즌 (10월~3월)이 시작하기 직전인 <strong>9월 말부터 접종 권고</strong></p>
             </div>
           </div>
           <div class="check-row" onclick="toggleCheck(2)">
             <div class="check-box-wrap">
               <div class="check-box" id="check2"></div>
             </div>
-            <span class="check-label">네, 확인했습니다.</span>
+            <span class="check-label">네, 꼭 기억할게요!</span>
           </div>
         </div>
       </div>
@@ -794,9 +926,9 @@
   <!-- ── 카드 3: QnA ──────────────────────── -->
 
   <div class="card card-3">
-    <!-- Vector 3 배경 (h=273.292, outer: left=-4 right=-5, inner: inset -1.83% -1.14%) -->
-    <div class="card-bg-outer" style="height: 273.292px; top: calc(50% - 0.35px);">
-      <div class="card-bg-inner" style="top:-1.83%; right:-1.14%; bottom:-1.83%; left:-1.42%;">
+    <!-- Vector 3 배경 -->
+    <div class="card-bg-outer">
+      <div class="card-bg-inner">
         <img src="https://hmgyoqymifgcamjfacbo.supabase.co/storage/v1/object/public/RSV/img/Vector%203.svg" alt="" />
       </div>
     </div>
@@ -885,6 +1017,8 @@
       alt=""
     />
   </div>
+
+  <p class="banner-legal">MAT-KR-2600509-1.0-03/2026</p>
 </section>
 
 <script>
