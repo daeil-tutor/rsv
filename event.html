@@ -577,15 +577,14 @@
     /* ═══════════════════════════════════════
        배너 섹션
     ═══════════════════════════════════════ */
+    /* Figma banner: py 30, gap 12, 구분선 전체폭 #635CDB 1px (Vector top/under line) */
     .banner {
       background: #cbd9ff;
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 12px;
-      padding: 30px 16px;
-      padding-left: max(16px, env(safe-area-inset-left));
-      padding-right: max(16px, env(safe-area-inset-right));
+      padding: 30px max(16px, env(safe-area-inset-left)) 30px max(16px, env(safe-area-inset-right));
       position: relative;
       width: 100%;
       max-width: 100%;
@@ -605,22 +604,28 @@
       pointer-events: none;
     }
 
-    /* 배너 구분선 (Vector8: h-0 + inset ±0.5px → 1px 라인) */
+    /*
+      구분선: Figma는 top/under line 모두 h-0 + 내부 SVG(1px)라 flex 스택 높이에 선 두께가 안 들어감.
+      height:1px만 쓰면 누적 시 1px씩 밀려 캐릭터 하단(y=149)과 under line(y=149) 정합이 깨짐.
+    */
     .banner-divider {
       position: relative;
       height: 0;
-      width: 100%;
       flex-shrink: 0;
+      margin: 0;
+      margin-left: calc(-1 * max(16px, env(safe-area-inset-left)));
+      margin-right: calc(-1 * max(16px, env(safe-area-inset-right)));
+      width: calc(100% + max(16px, env(safe-area-inset-left)) + max(16px, env(safe-area-inset-right)));
     }
 
     .banner-divider::after {
       content: '';
       position: absolute;
-      top: -0.5px;
-      bottom: -0.5px;
       left: 0;
       right: 0;
-      background: rgba(99, 92, 219, 0.35);
+      top: 0;
+      height: 1px;
+      background: #635cdb;
     }
 
     /* 배너 텍스트 */
@@ -714,8 +719,7 @@
       letter-spacing: -0.48px;
       text-align: center;
       line-height: normal;
-      white-space: normal;
-      word-break: break-all;
+      white-space: nowrap;
       max-width: 100%;
       flex-shrink: 0;
     }
