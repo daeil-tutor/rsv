@@ -334,6 +334,7 @@
       var enterBtn = document.getElementById('enterBtn')
       var toast = document.getElementById('toast')
       var toastTimer = null
+      var isSubmitting = false
 
       function showToast(message, duration) {
         duration = duration !== undefined ? duration : 2500
@@ -346,12 +347,16 @@
       }
 
       async function submitNickname() {
+        // 동기 가드: 이미 전송 중이면(이미 큐에 들어온 중복 이벤트 포함) 즉시 중단
+        if (isSubmitting) return
+
         var nickname = input.value.trim()
         if (!nickname) {
           showToast('태명을 입력해주세요')
           return
         }
 
+        isSubmitting = true
         input.disabled = true
         enterBtn.disabled = true
 
@@ -371,9 +376,14 @@
             var errText = await res.text()
             console.error('Supabase REST', res.status, errText)
             showToast('저장에 실패했어요. 다시 시도해주세요.')
+            // 실패 시에만 재시도할 수 있도록 잠금 해제
+            isSubmitting = false
+            input.disabled = false
+            enterBtn.disabled = false
             return
           }
 
+          // 성공: 화면 전환 전까지 잠금 유지 (버튼 재활성화 안 함 → 중복 insert 방지)
           localStorage.setItem('rsv_nickname', nickname)
           setTimeout(function () {
             window.location.href =
@@ -382,7 +392,8 @@
         } catch (e) {
           console.error(e)
           showToast('네트워크 오류가 났어요. 다시 시도해주세요.')
-        } finally {
+          // 네트워크 오류 시에만 재시도할 수 있도록 잠금 해제
+          isSubmitting = false
           input.disabled = false
           enterBtn.disabled = false
         }
